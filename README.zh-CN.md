@@ -1,6 +1,6 @@
-# Gemini Chat Minimap
+<h3 align="center">Gemini Chat Minimap</h3>
 
-[English](./README.md) | [简体中文]
+<div align="center"><a href="README.md" >English</a> | 简体中文</div>
 
 ---
 

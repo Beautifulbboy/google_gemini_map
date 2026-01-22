@@ -14,7 +14,6 @@
 ---
 
 <a name="english"></a>
-## English
 
 An interactive browser extension designed to enhance the Gemini (Google AI) chat experience. It adds a navigation bar similar to the **VS Code Minimap** on the right side of the page, helping users quickly locate, preview, and jump through long conversations.
 

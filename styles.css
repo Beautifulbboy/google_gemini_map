@@ -1,7 +1,7 @@
 /* --- 保持原有的 Minimap 容器样式 --- */
 #gemini-minimap-container {
     position: fixed;
-    top: 60px;
+    top: 80px;
     right: 10px;
     width: 60px;
     height: 80vh;

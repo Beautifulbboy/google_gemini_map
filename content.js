@@ -73,7 +73,7 @@ function initMinimap() {
                 if (scrollParent && scrollParent !== document.body) {
                     // 如果是在内部容器滚动 (Gemini 的常见情况)
                     const targetOffsetTop = block.offsetTop;
-                    const containerOffset = 40; // 预留顶部距离
+                    const containerOffset = 20; // 预留顶部距离
                     
                     scrollParent.scrollTo({
                         top: targetOffsetTop - containerOffset,

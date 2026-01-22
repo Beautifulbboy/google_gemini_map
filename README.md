@@ -1,4 +1,8 @@
-<h3 align="center">Gemini Chat Minimap</h3>
+<div align="center"> 
+
+# Gemini Chat Minimap
+
+</div>
 
 <p align="center">
   <a href="https://github.com/Beautifulbboy/gemini-chat-minimap.git">

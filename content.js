@@ -30,6 +30,11 @@ function initMinimap() {
 
         minimap.innerHTML = '';
 
+        // --- 新增：创建指示器元素 ---
+        const indicator = document.createElement('div');
+        indicator.id = 'minimap-viewport-indicator';
+        minimap.appendChild(indicator);
+
         messageBlocks.forEach((block) => {
             const isUser = block.tagName.toLowerCase() === 'user-query';
             // 提取文本，移除多余换行
@@ -122,6 +127,7 @@ function initMinimap() {
 
             minimap.appendChild(mapItem);
         });
+        syncIndicator();
     };
 
     // 延时启动 + 监听变化
@@ -145,6 +151,11 @@ function initMinimap() {
             }
         }
     }, { passive: true });
+    // 定时检查并绑定滚动容器，确保最新对话加载后依然有效
+    setInterval(syncIndicator, 1000); // 兜底每秒同步一次
+
+    // 捕获所有滚动事件
+    window.addEventListener('scroll', syncIndicator, { capture: true, passive: true });
 }
 
 window.addEventListener('load', initMinimap);
@@ -154,3 +165,73 @@ setInterval(() => {
         initMinimap();
     }
 }, 3000);
+
+// 同步指示器位置的函数
+function syncIndicator() {
+    const indicator = document.getElementById('minimap-viewport-indicator');
+    const minimap = document.getElementById('gemini-minimap-container');
+    if (!indicator || !minimap) return;
+
+    // 1. 找到屏幕中心点当前的对话块
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const centerElement = document.elementFromPoint(centerX, centerY);
+    
+    // 2. 确定当前视口聚焦的 Block
+    const currentBlock = centerElement?.closest('user-query, model-response');
+
+    if (currentBlock) {
+        // 获取所有对话块列表，通过索引来确定“上一条”或“下一条”
+        const allBlocks = Array.from(document.querySelectorAll('user-query, model-response'));
+        const currentIndex = allBlocks.indexOf(currentBlock);
+        
+        if (currentIndex === -1) return;
+
+        // 3. 确定“完整对话组”的起始和结束索引
+        // 核心逻辑：无论当前看的是提问还是回答，都高亮 [提问, 回答] 这一对
+        let startIndex = currentIndex;
+        let endIndex = currentIndex;
+
+        const currentTag = currentBlock.tagName.toLowerCase();
+
+        if (currentTag === 'user-query') {
+            // 如果当前看的是【提问】，尝试把紧接着的【回答】也包进来
+            const nextBlock = allBlocks[currentIndex + 1];
+            if (nextBlock && nextBlock.tagName.toLowerCase() === 'model-response') {
+                endIndex = currentIndex + 1;
+            }
+        } else if (currentTag === 'model-response') {
+            // 如果当前看的是【回答】，尝试把上面的【提问】也包进来
+            const prevBlock = allBlocks[currentIndex - 1];
+            if (prevBlock && prevBlock.tagName.toLowerCase() === 'user-query') {
+                startIndex = currentIndex - 1;
+            }
+        }
+
+        // 4. 映射到 Minimap 上的色块元素
+        const items = minimap.querySelectorAll('.minimap-item');
+        const startItem = items[startIndex];
+        const endItem = items[endIndex];
+
+        if (startItem && endItem) {
+            // 5. 计算覆盖高度：从“起始块的顶部”到“结束块的底部”
+            // 加上 gap (2px) 的微调，让框看起来更完整
+            const topPos = startItem.offsetTop;
+            const bottomPos = endItem.offsetTop + endItem.offsetHeight;
+            const totalHeight = bottomPos - topPos;
+
+            // 应用样式
+            indicator.style.top = `${topPos}px`;
+            indicator.style.height = `${totalHeight}px`;
+            indicator.style.opacity = "1";
+            return;
+        }
+    }
+    
+    // 如果没有找到焦点（比如在页面顶部空白处），让指示器变淡
+    indicator.style.opacity = "0.3"; 
+}
+
+// 绑定滚动事件，实时更新指示器
+// 找到 Gemini 的滚动监听目标（通常是 window 捕获内部滚动）
+window.addEventListener('scroll', syncIndicator, { capture: true, passive: true });

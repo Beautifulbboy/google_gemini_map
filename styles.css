@@ -76,15 +76,21 @@
     text-transform: uppercase;
 }
 
-/* 当前视口指示器 - 模拟内容在屏幕中的位置 */
+/* 当前视口指示器 - 遮罩高亮风格 */
 #minimap-viewport-indicator {
     position: absolute;
     left: 0;
     width: 100%;
-    background: rgba(66, 133, 244, 0.2); /* 浅蓝色透明背景 */
-    border-top: 1px solid rgba(66, 133, 244, 0.4);
-    border-bottom: 1px solid rgba(66, 133, 244, 0.4);
-    pointer-events: none; /* 确保不影响点击色块 */
+    
+    /* 核心修改：从线框变为遮罩 */
+    background-color: rgba(66, 133, 244, 0.25); /* 填充半透明的 Google Blue */
+    border: 1px solid rgba(66, 133, 244, 0.8);   /* 边框颜色加深，更清晰 */
+    box-shadow: 0 0 12px rgba(66, 133, 244, 0.4); /* 添加光晕，增加层次感 */
+    backdrop-filter: contrast(1.2); /* (可选) 增加对比度，让遮罩下的色块更鲜艳 */
+    
+    border-radius: 6px; /* 圆角配合遮罩风格 */
+    pointer-events: none; /* 必须保留，确保鼠标能穿透遮罩点击下面的色块 */
     z-index: 10000;
-    transition: top 0.1s linear, height 0.1s linear; /* 平滑移动 */
+    transition: all 0.15s ease-out; /* 保持平滑跟随 */
+    box-sizing: border-box;
 }
